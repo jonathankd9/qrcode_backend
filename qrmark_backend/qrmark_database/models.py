@@ -4,7 +4,6 @@ from .manager import UserManager
 
 class User(AbstractBaseUser):
     user_id = models.CharField(max_length=8, unique=True)
-    pin = models.CharField(max_length=5)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True, null=True)

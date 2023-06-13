@@ -41,31 +41,8 @@ class LecturerSerializer(serializers.ModelSerializer):
 
 class StudentLoginSerializer(serializers.Serializer):
     student_id = serializers.CharField(max_length=8)
-    pin = serializers.CharField(max_length=5, write_only=True)
-    
-    def validate(self, data):
-        student_id = data.get("student_id")
-        password = data.get("pin")
-        user = authenticate(request=self.context.get("request"), user_id=student_id, password=password)
-        if not user:
-            raise serializers.ValidationError("Unable to login with provided credentials")
-        if not user.is_student:
-            raise serializers.ValidationError("Unable to login with provided credentials") 
-        data["user"] = user
-        return data
-        
+    pin = serializers.CharField(max_length=5)
+
 class LecturerLoginSerializer(serializers.Serializer):
     lecturer_id = serializers.CharField(max_length=8)
-    pin = serializers.CharField(max_length=5, write_only=True)
-    
-    def validate(self, data):
-        lecturer_id = data.get("lecturer_id")
-        password = data.get("pin")
-        user = authenticate(request=self.context.get("request"), user_id=lecturer_id, password=password)
-        if not user:
-            raise serializers.ValidationError("Unable to login with provided credentials")
-        if not user.is_lecturer:
-            raise serializers.ValidationError("Unable to login with provided credentials") 
-        data["user"] = user
-        return data
-        
+    pin = serializers.CharField(max_length=5)
