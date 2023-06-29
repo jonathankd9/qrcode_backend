@@ -44,10 +44,10 @@ class LecturerLoginAPI(generics.GenericAPIView):
         
         lecturer_id = serializer.validated_data["lecturer_id"]
         pin = serializer.validated_data["pin"]
-        
+
         user = authenticate(request=self.request, user_id=lecturer_id, password=pin)
         
-        if user is None or not user.is_student:
+        if user is None or not user.is_lecturer:
             response_data = {
                 "message": "Invalid credentials",
                 "data": None,
