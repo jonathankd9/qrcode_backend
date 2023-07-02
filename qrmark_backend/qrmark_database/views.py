@@ -4,6 +4,9 @@ from knox.models import AuthToken
 from django.contrib.auth import authenticate
 from .serializers import *
 from .models import *
+import time
+import random
+from datetime import datetime
 from qrcode import make
 from django.core.files.base import ContentFile
 import io
@@ -85,7 +88,12 @@ class GenerateQrCodeAPI(generics.GenericAPIView):
         lecturer = serializer.validated_data["lecturer"]
         course = serializer.validated_data["course"]
         
-        qr_code = make(f"{lecturer.id}_{course.id}")
+        # Generate a unique dynamic data for the QR code
+        timestamp = int(time.time())
+        random_value = random.randint(1000, 9999)
+        dynamic_data = f"{lecturer.id}_{course.id}_{timestamp}_{random_value}"
+        
+        qr_code = make(dynamic_data)
 
         # Create an in-memory file-like object to hold the image data
         image_io = io.BytesIO()
