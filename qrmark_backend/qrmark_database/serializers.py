@@ -50,7 +50,9 @@ class LecturerLoginSerializer(serializers.Serializer):
 class QRCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = QrCode
-        fields = ['lecturer', 'course', 'qr_code']
-        read_only_fields = ['qr_code']
+        fields = ['id','lecturer', 'course', 'qr_code']
+        read_only_fields = ['id','qr_code']
 
-    
+class QRCodeScanSerializer(serializers.Serializer):
+    qr_code_id = serializers.IntegerField()
+    student_id = serializers.CharField(max_length=8)
