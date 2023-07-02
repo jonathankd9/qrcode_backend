@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from .models import User,Student, Lecturer
+from .models import User,Student, Lecturer, QrCode
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,3 +46,11 @@ class StudentLoginSerializer(serializers.Serializer):
 class LecturerLoginSerializer(serializers.Serializer):
     lecturer_id = serializers.CharField(max_length=8)
     pin = serializers.CharField(max_length=5)
+
+class QRCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QrCode
+        fields = ['lecturer', 'course', 'qr_code']
+        read_only_fields = ['qr_code']
+
+    
