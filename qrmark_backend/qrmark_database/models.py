@@ -36,7 +36,6 @@ class User(AbstractBaseUser):
 
 class Student(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.CharField(max_length=100)
     lecturer = models.CharField(max_length=100)
     level = models.IntegerField()
     
@@ -46,7 +45,6 @@ class Student(models.Model):
 
 class Lecturer(models.Model):
     lecturer = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
         return self.lecturer.user_id
@@ -79,7 +77,7 @@ class QrCode(models.Model):
         ordering = ['-created_at']
     
 class Attendance(models.Model):
-    student = models.ManyToManyField(Student)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances', null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='attendances')
     qr_code = models.ForeignKey(QrCode, on_delete=models.CASCADE, related_name='attendances')
     created_at = models.DateTimeField(auto_now_add=True)

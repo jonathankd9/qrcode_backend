@@ -127,7 +127,6 @@ class ScanQRCodeAPI(generics.GenericAPIView):
         if not student.is_student:
             response_data = {
                 "message": "Only students can scan QR codes",
-                "data": None,
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         
@@ -135,26 +134,23 @@ class ScanQRCodeAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         # Retrieve the student information from the request data
-        student_id = request.data.get('student_id')
         qr_code_id = request.data.get('qr_code_id')
+        enrolled_student = Student.objects.filter(student=student).first()
+        qr_code = QrCode.objects.filter(id=qr_code_id).first()
+        course = qr_code.course   
+        
+        # Check if the student is enrolled in the course
+        if enrolled_student in course.students.all():
+            # Mark attendance for the student
+            Attendance.objects.create(student=enrolled_student, course=course, qr_code=qr_code)
 
-        # Retrieve the student, course, and QR code instances
-        student = get_object_or_404(Student, student_id=student_id)
-        qr_code = get_object_or_404(QrCode, id=qr_code_id)
-        course = qr_code.course
-
-        # Check if the student is registered for the course
-        if not student.is_registered_for_course(course):
             response_data = {
-                'message': 'Student is not registered for this course.',
-                'data': None
+                'message': 'Attendance marked successfully.',
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data = {
+                'message': 'Student is not enrolled in the course',
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        # Mark attendance for the student
-        attendance = Attendance.objects.create(student=student, course=course, qr_code=qr_code)
-
-        response_data = {
-            'message': 'Attendance marked successfully.',
-        }
-        return Response(response_data, status=status.HTTP_201_CREATED)

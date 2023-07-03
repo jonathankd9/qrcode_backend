@@ -55,4 +55,3 @@ class QRCodeSerializer(serializers.ModelSerializer):
 
 class QRCodeScanSerializer(serializers.Serializer):
     qr_code_id = serializers.IntegerField()
-    student_id = serializers.CharField(max_length=8)
