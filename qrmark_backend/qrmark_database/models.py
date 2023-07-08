@@ -37,7 +37,7 @@ class User(AbstractBaseUser):
 class Student(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     lecturer = models.CharField(max_length=100)
-    level = models.IntegerField()
+    level = models.IntegerField(null=True, blank=True)
     
     def __str__(self):
         return self.student.user_id
