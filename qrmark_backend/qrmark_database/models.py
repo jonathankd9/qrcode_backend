@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from .manager import UserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from qrmark_backend.utils.enums import Gender
 
 
 class User(AbstractBaseUser):
@@ -10,6 +11,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices= [(gender, gender.value) for gender in Gender],null=True, blank=True)
     is_student = models.BooleanField(default=False)
     is_lecturer = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

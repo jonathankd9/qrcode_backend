@@ -1,14 +1,34 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from .models import User,Student, Lecturer, QrCode
+from .models import User,Student, Lecturer, QrCode, Course
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['course', 'level']
 
 class UserSerializer(serializers.ModelSerializer):
+    courses = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ['user_id','first_name', 'last_name', 'other_names','password','is_student','is_lecturer']
+        fields = ['user_id','first_name', 'last_name', 'other_names','gender','password','is_student','is_lecturer','courses']
+        read_only_fields = ['is_student','is_lecturer']
         
         extra_kwargs = {'password': {'write_only': True}}
+    
+    def get_courses(self, user):
+        courses = []
+        if user.is_student:
+            student = Student.objects.filter(student=user).first()
+            if student:
+                courses = student.courses_enrolled.all()
+        elif user.is_lecturer:
+            lecturer = Lecturer.objects.filter(lecturer=user).first()
+            if lecturer:
+                courses = lecturer.courses_taught.all()
+        return CourseSerializer(courses, many=True).data
         
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
