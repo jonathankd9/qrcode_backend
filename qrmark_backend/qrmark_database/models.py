@@ -11,7 +11,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices= [(gender, gender.value) for gender in Gender],null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=[(gender.value, gender.name) for gender in Gender], null=True, blank=True)
     is_student = models.BooleanField(default=False)
     is_lecturer = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
