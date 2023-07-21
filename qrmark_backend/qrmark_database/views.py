@@ -7,25 +7,26 @@ from .models import *
 import time
 import random
 from datetime import datetime
+from django.contrib.auth.hashers import make_password
 from qrcode import make
 from django.core.files.base import ContentFile
 import io
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.shortcuts import get_object_or_404
 
+# For Student Login
 class StudentLoginAPI(generics.GenericAPIView):
     serializer_class = StudentLoginSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         student_id = serializer.validated_data["student_id"]
         pin = serializer.validated_data["pin"]
-        
+        # Authenticate the student
         user = authenticate(request=self.request, user_id=student_id, password=pin)
-        
+
         if user is None or not user.is_student:
             response_data = {
                 "message": "Invalid credentials",
@@ -33,15 +34,39 @@ class StudentLoginAPI(generics.GenericAPIView):
                 "token": None
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-                
+
+        # Retrieve the Student instance corresponding to the authenticated user
+        student = Student.objects.filter(student=user).first()
+
+        if not student:
+            response_data = {
+                "message": "Student record not found",
+                "data": None,
+                "token": None
+            }
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize the student information
+        student_serializer = StudentSerializer(student)
+        
+        # Retrieve the courses the student is enrolled in
+        courses = student.courses_enrolled.all()
+        
+        # Serialize the courses
+        courses_serializer = CourseSerializer(courses, many=True)
+
         response_data = {
             "message": "Login successful",
-            "data": UserSerializer(user, context=self.get_serializer_context()).data,
+            "data": {
+                "user_info": UserSerializer(user, context=self.get_serializer_context()).data,
+                "student_info": student_serializer.data,
+                "courses": courses_serializer.data,
+            },
             "token": AuthToken.objects.create(user)[1]
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-
+# For Lecturer Login
 class LecturerLoginAPI(generics.GenericAPIView):
     serializer_class = LecturerLoginSerializer
     permission_classes = [permissions.AllowAny]
@@ -62,14 +87,38 @@ class LecturerLoginAPI(generics.GenericAPIView):
                 "token": None
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-                
+        
+        # Retrieve the Lecturer instance corresponding to the authenticated user
+        lecturer = Lecturer.objects.filter(lecturer=user).first()
+        if not lecturer:
+            response_data = {
+                "message": "Lecturer record not found",
+                "data": None,
+                "token": None
+            }
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serialize the lecturer information
+        lecturer_serializer = LecturerSerializer(lecturer)
+        
+        # Retrieve the courses the lecturer teaches
+        courses = lecturer.courses_taught.all()
+    
+        # Serialize the courses
+        courses_serializer = CourseSerializer(courses, many=True)
+         
         response_data = {
             "message": "Login successful",
-            "data": UserSerializer(user, context=self.get_serializer_context()).data,
+            "data": {
+                'user_info': UserSerializer(user, context=self.get_serializer_context()).data,
+                'lecturer_info': lecturer_serializer.data,
+                'courses': courses_serializer.data,
+                     },
             "token": AuthToken.objects.create(user)[1]
         }
         return Response(response_data, status=status.HTTP_200_OK)
-    
+
+# For QR Code Generation
 class GenerateQrCodeAPI(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
@@ -117,7 +166,7 @@ class GenerateQrCodeAPI(generics.GenericAPIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
     
-
+# For QR Code Scanning
 class ScanQRCodeAPI(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = QRCodeScanSerializer

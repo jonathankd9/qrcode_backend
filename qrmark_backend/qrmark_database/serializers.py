@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
 
 from .models import User,Student, Lecturer, QrCode, Course
 
@@ -9,25 +8,12 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['course', 'level']
 
 class UserSerializer(serializers.ModelSerializer):
-    courses = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['user_id','first_name', 'last_name', 'other_names','gender','password','courses']
+        fields = ['user_id','first_name', 'last_name', 'other_names','email','gender','password']
         
         extra_kwargs = {'password': {'write_only': True}}
-    
-    def get_courses(self, user):
-        courses = []
-        if user.is_student:
-            student = Student.objects.filter(student=user).first()
-            if student:
-                courses = student.courses_enrolled.all()
-        elif user.is_lecturer:
-            lecturer = Lecturer.objects.filter(lecturer=user).first()
-            if lecturer:
-                courses = lecturer.courses_taught.all()
-        return CourseSerializer(courses, many=True).data
         
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -51,12 +37,12 @@ class UserSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['student', 'course', 'lecturer', 'level']
+        fields = ['program', 'level', 'semester']
 
 class LecturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lecturer
-        fields = ['lecturer', 'course']
+        fields = ['phone_number', 'office']
 
 class StudentLoginSerializer(serializers.Serializer):
     student_id = serializers.CharField(max_length=8)

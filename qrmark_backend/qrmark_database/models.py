@@ -3,11 +3,12 @@ from django.contrib.auth.models import AbstractBaseUser
 from .manager import UserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from qrmark_backend.utils.enums import Gender
+from qrmark_backend.utils.enums import Gender, Level, Semester
 
 
 class User(AbstractBaseUser):
     user_id = models.CharField(max_length=8, unique=True)
+    email = models.EmailField(max_length=100, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True, null=True)
@@ -38,8 +39,9 @@ class User(AbstractBaseUser):
 
 class Student(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    lecturer = models.CharField(max_length=100)
-    level = models.IntegerField(null=True, blank=True)
+    program = models.CharField(max_length=100, blank=True, null=True)
+    level = models.CharField(max_length=10, choices=[(level.value, level.name) for level in Level], blank=True, null=True)
+    semester = models.CharField(max_length=10, choices=[(semester.value, semester.name) for semester in Semester], blank=True, null=True)
     
     def __str__(self):
         return self.student.user_id
@@ -47,6 +49,8 @@ class Student(models.Model):
 
 class Lecturer(models.Model):
     lecturer = models.ForeignKey(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    office = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
         return self.lecturer.user_id

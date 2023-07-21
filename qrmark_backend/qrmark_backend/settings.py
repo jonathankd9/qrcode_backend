@@ -57,6 +57,10 @@ MIDDLEWARE = [
 ]
 AUTH_USER_MODEL = 'qrmark_database.User'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend'
+]
+
 ROOT_URLCONF = 'qrmark_backend.urls'
 
 TEMPLATES = [
