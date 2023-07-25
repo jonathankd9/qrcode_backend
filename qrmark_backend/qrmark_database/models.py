@@ -56,7 +56,8 @@ class Lecturer(models.Model):
         return self.lecturer.user_id
 
 class Course(models.Model):
-    course = models.CharField(max_length=100)
+    code = models.CharField(max_length=7, blank=True, null=True)
+    title = models.CharField(max_length=100)
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE, related_name='courses_taught')
     level = models.IntegerField()
     students = models.ManyToManyField(Student, related_name='courses_enrolled')
