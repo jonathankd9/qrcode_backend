@@ -56,7 +56,7 @@ class Lecturer(models.Model):
         return self.lecturer.user_id
 
 class Course(models.Model):
-    code = models.CharField(max_length=7, blank=True, null=True)
+    code = models.CharField(max_length=8, blank=True, null=True)
     title = models.CharField(max_length=100)
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE, related_name='courses_taught')
     level = models.IntegerField()
@@ -65,7 +65,7 @@ class Course(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.course
+        return self.code
     
     class Meta:
         ordering = ['-created_at']
