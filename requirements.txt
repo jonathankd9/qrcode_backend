@@ -13,11 +13,15 @@ dynaconf==3.1.12
 hvac==1.1.0
 idna==3.4
 loguru==0.7.0
+Pillow==10.0.0
 pycparser==2.21
 pyhcl==0.4.4
+pypng==0.20220715.0
 pytz==2023.3
+qrcode==7.4.2
 requests==2.31.0
 shortuuid==1.0.11
 sqlparse==0.4.4
+typing_extensions==4.7.1
 urllib3==2.0.3
 validators==0.20.0
