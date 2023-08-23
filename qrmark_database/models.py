@@ -12,6 +12,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True, null=True)
+    full_name = models.CharField(max_length=100, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=[(gender.value, gender.name) for gender in Gender], null=True, blank=True)
     is_student = models.BooleanField(default=False)
     is_lecturer = models.BooleanField(default=False)
@@ -34,7 +35,21 @@ class User(AbstractBaseUser):
         return True
     
     def get_short_name(self):
-        return self.user_id
+        return self.first_name
+    
+    def save(self, *args, **kwargs):
+        # Combine the first_name, last_name, and other_names to create full_name
+        if self.first_name and self.last_name:
+            if self.other_names:
+                self.full_name = f"{self.first_name} {self.other_names} {self.last_name}"
+            else:
+                self.full_name = f"{self.first_name} {self.last_name}"
+        else:
+            self.full_name = None
+
+        super().save(*args, **kwargs)
+    
+
 
 
 class Student(models.Model):

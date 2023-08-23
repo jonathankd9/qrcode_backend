@@ -136,11 +136,12 @@ class GenerateQrCodeAPI(generics.GenericAPIView):
         
         lecturer = serializer.validated_data["lecturer"]
         course = serializer.validated_data["course"]
+        # qr_code_id = serializer.validated_data["id"]
         
         # Generate a unique dynamic data for the QR code
         timestamp = int(time.time())
         random_value = random.randint(1000, 9999)
-        dynamic_data = f"{lecturer.id}_{course.id}_{timestamp}_{random_value}"
+        dynamic_data = f"{lecturer.lecturer.full_name}_{course.code}_{timestamp}_{random_value}"
         
         qr_code = make(dynamic_data)
 
