@@ -89,6 +89,7 @@ class QrCode(models.Model):
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE, related_name='qrcodes')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='qrcodes')
     qr_code = models.ImageField(upload_to='qr_codes')
+    qr_code_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
