@@ -255,7 +255,7 @@ class CRUDCodeAPI(APIView):
     def get(self, request, *args, **kwargs):
         '''Used to get all unique codes created by user'''
         print(request.user)
-        codes = UniqueCode.objects.filter(course__lecturer=request.user)
+        codes = UniqueCode.objects.filter(course__lecture=request.user)
         return Response({
             "codes": CodesSerializer(codes, many=True).data
         }, status=status.HTTP_200_OK)
@@ -269,7 +269,7 @@ class CRUDCodeAPI(APIView):
         # start_time = request.data.get("start_time")
         # end_time = request.data.get("end_time")
         # get course
-        course = Course.objects.filter(lecturer=user, code=course_code).first() # noqa
+        course = Course.objects.filter(lecture=user, code=course_code).first() # noqa
         # check if course exists
         if course is None:
             return Response({
