@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'qrcode',
     'qrmark_database',
+    'api',
     'rest_framework',
     'corsheaders',
     'knox'
