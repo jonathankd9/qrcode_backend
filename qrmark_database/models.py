@@ -76,7 +76,7 @@ class Lecturer(models.Model):
 class Course(models.Model):
     code = models.CharField(max_length=8, blank=True, null=True)
     title = models.CharField(max_length=100)
-    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE, related_name='courses_taught')
+    lecturer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses_taught')
     level = models.IntegerField()
     students = models.ManyToManyField(Student, related_name='courses_enrolled')
     created_at = models.DateTimeField(auto_now_add=True)

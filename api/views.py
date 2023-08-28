@@ -286,9 +286,9 @@ class CRUDCodeAPI(APIView):
         for student in students:
             obj = UniqueCode(
                 course=course,
-                valid_date=valid_date,
-                start_time=start_time,
-                end_time=end_time
+                # valid_date=valid_date,
+                # start_time=start_time,
+                # end_time=end_time
             )
             unique_codes.append(obj)
         # save unique codes
