@@ -5,7 +5,8 @@ from .models import User,Student, Lecturer, QrCode, Course
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ['code','title', 'level']
+        fields = ['id','code','title', 'level']
+        read_only_fields = ['id']
 
 class UserSerializer(serializers.ModelSerializer):
     
