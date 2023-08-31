@@ -1,7 +1,7 @@
 # django
 from django.shortcuts import render
 from django.contrib.auth import login
-from qrmark_database.models import Course, Student, UniqueCode
+from qrmark_database.models import Course, Student, UniqueCode, Attendance
 from api.serializers import CodesSerializer, CourseSerializer, StudentSerializer, UserSerializer
 
 # rest framework
@@ -254,8 +254,8 @@ class CRUDCodeAPI(APIView):
     
     def get(self, request, *args, **kwargs):
         '''Used to get all unique codes created by user'''
-        print(request.user)
-        codes = UniqueCode.objects.filter(course__lecture=request.user)
+        # print(request.user)
+        codes = UniqueCode.objects.filter(course__lecture=request.user, is_valid=True)
         return Response({
             "codes": CodesSerializer(codes, many=True).data
         }, status=status.HTTP_200_OK)
@@ -301,20 +301,47 @@ class CRUDCodeAPI(APIView):
 
 class TakeAttendanceAPI(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
-        student_id = request.data.get("student_id")
+        student = request.user
         code = request.data.get("code")
-        attendance_code = UniqueCode.objects.filter(code=code).first()
+        course_code = request.data.get("course_code")
+        course = Course.objects.filter(code=course_code).first()
+        attendance_code = UniqueCode.objects.filter(code=code,course=course).first()
         if attendance_code is None:
             return Response({
-                "message": "Code Not Found"
+                "message": "Invalid Code or Course Not Found"
             }, status=status.HTTP_404_NOT_FOUND)
         course = attendance_code.course
-        # chceck if student is in course
-        student = Student.objects.filter(student_id=student_id, course=course).first() # noqa
-        if student is None:
+
+        # check if code is valid
+        if not attendance_code.is_valid:
             return Response({
-                "message": "Student Not Found"
-            }, status=status.HTTP_404_NOT_FOUND)
-       
+                "message": "Code Has Been Used"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # check if student is in course
+        enrolled_student = Student.objects.filter(student=student).first()
+        print(enrolled_student)
+        print(course.students.all())
+        if enrolled_student in course.students.all():
+            # check if student is registered for the course
+            if enrolled_student.courses_enrolled.filter(id=course.id).exists():
+                # mark attendance
+                Attendance.objects.create(
+                    student=enrolled_student,
+                    attendance_code=attendance_code
+                )
+                attendance_code.is_valid = False
+                attendance_code.save()
+                return Response({
+                    "message": "Attendance Marked Successfully"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "message": "Student Not Registered for Course"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "message": "Student Not Enrolled in Course"
+            }, status=status.HTTP_400_BAD_REQUEST)

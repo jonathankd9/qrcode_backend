@@ -112,6 +112,7 @@ class UniqueCode(models.Model):
 
     code = models.CharField(max_length=5, default=generate_code)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    is_valid = models.BooleanField(default=True,)
     # valid_date = models.DateField()
     # start_time = models.TimeField()
     # end_time = models.TimeField()
@@ -134,9 +135,9 @@ class UniqueCode(models.Model):
 
 class Attendance(models.Model):
     '''Model for managing attendance'''
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True,limit_choices_to={'student__courses_enrolled__isnull': False})
     attendance_code = models.ForeignKey(UniqueCode, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.student.student_name
+        return self.attendance_code.code

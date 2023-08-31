@@ -23,4 +23,5 @@ urlpatterns += [
     path("students/", views.CRUDStudent.as_view(), name="students"),
     path("delete-student/", views.DeleteStudentAPI.as_view(), name="delete-student"),
     path("codes/", views.CRUDCodeAPI.as_view(), name="codes"),
+    path('attendance/', views.TakeAttendanceAPI.as_view(), name='attendance'),
 ]

@@ -119,55 +119,6 @@ class LecturerLoginAPI(generics.GenericAPIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-# For QR Code Generation
-# class GenerateQrCodeAPI(generics.GenericAPIView):
-#     permission_classes = [permissions.IsAuthenticated]
-    
-#     def post(self, request, *args, **kwargs):
-#         lecturer = request.user
-#         if not lecturer.is_lecturer:
-#             response_data = {
-#                 "message": "Only lecturers can generate QR codes",
-#                 "data": None,
-#             }
-#             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        
-#         serializer = QRCodeSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-        
-#         lecturer = serializer.validated_data["lecturer"]
-#         course = serializer.validated_data["course"]
-#         qr_code_id = serializer.validated_data["id"]
-#         print(qr_code_id)
-        
-#         # Generate a unique dynamic data for the QR code
-#         timestamp = int(time.time())
-#         random_value = random.randint(1000, 9999)
-#         dynamic_data = f"{lecturer.lecturer.full_name}_{course.code}_{timestamp}_{random_value}"
-        
-#         qr_code = make(dynamic_data)
-
-#         # Create an in-memory file-like object to hold the image data
-#         image_io = io.BytesIO()
-#         qr_code.save(image_io, format='PNG')
-
-#         # Create an InMemoryUploadedFile from the in-memory file-like object
-#         image_file = InMemoryUploadedFile(
-#             image_io,
-#             None,
-#             'qr_code.png',
-#             'image/png',
-#             len(image_io.getvalue()),
-#             None
-#         )
-
-#         serializer.save(qr_code=image_file)
-        
-#         response_data = {
-#             "message": "QR code generated successfully",
-#             "data": serializer.data,
-#         }
-#         return Response(response_data, status=status.HTTP_200_OK)
 
 class GenerateQrCodeAPI(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
