@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User,Student, Lecturer, QrCode, Course
+from .models import User,Student, Lecturer, QrCode, Course, Attendance
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:

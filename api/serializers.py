@@ -56,3 +56,14 @@ class CodesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UniqueCode
         fields = '__all__'
+
+    
+class AttendanceSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.student.full_name', read_only=True)
+    student_id = serializers.CharField(source='student.student.user_id', read_only=True)
+    code = serializers.CharField(source='attendance_code.code', read_only=True)
+
+    class Meta:
+        model = Attendance
+        fields = ['student','student_name', 'student_id', 'attendance_code', 'code']
+        read_only_fields = ['student', 'student_name', 'student_id','code']

@@ -1,8 +1,8 @@
 # django
 from django.shortcuts import render
 from django.contrib.auth import login
-from qrmark_database.models import Course, Student, UniqueCode, Attendance
-from api.serializers import CodesSerializer, CourseSerializer, StudentSerializer, UserSerializer
+from qrmark_database.models import Course, Student, UniqueCode, Attendance, Lecturer
+from api.serializers import CodesSerializer, CourseSerializer, StudentSerializer, UserSerializer, AttendanceSerializer
 
 # rest framework
 from rest_framework.views import APIView
@@ -299,9 +299,41 @@ class CRUDCodeAPI(APIView):
         # return unique codes
         
 
-class TakeAttendanceAPI(APIView):
+class AttendanceAPI(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AttendanceSerializer
 
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_lecturer:
+            return Response({
+                "message": "Only Lecturers Can View Attendance"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        lecturer = Lecturer.objects.filter(lecturer=user).first()
+        if not lecturer:
+            return Response({
+                "message": "Lecturer Not Found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        course_code = request.GET.get("course_code")
+        print(course_code)
+        if not course_code:
+            return Response({
+                "message": "Course Code is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        course = Course.objects.filter(code=course_code, lecturer=lecturer).first()
+        if not course:
+            return Response({
+                "message": "Course Not Found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        attendances = Attendance.objects.filter(attendance_code__course=course)
+        serialized_attendances = AttendanceSerializer(attendances, many=True).data
+        return Response({
+            "attendances": serialized_attendances
+        }, status=status.HTTP_200_OK)
+        
     def post(self, request, *args, **kwargs):
         student = request.user
         code = request.data.get("code")
@@ -322,8 +354,6 @@ class TakeAttendanceAPI(APIView):
 
         # check if student is in course
         enrolled_student = Student.objects.filter(student=student).first()
-        print(enrolled_student)
-        print(course.students.all())
         if enrolled_student in course.students.all():
             # check if student is registered for the course
             if enrolled_student.courses_enrolled.filter(id=course.id).exists():

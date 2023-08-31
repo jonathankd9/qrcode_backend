@@ -135,7 +135,7 @@ class UniqueCode(models.Model):
 
 class Attendance(models.Model):
     '''Model for managing attendance'''
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True,limit_choices_to={'student__courses_enrolled__isnull': False})
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True,)
     attendance_code = models.ForeignKey(UniqueCode, on_delete=models.CASCADE, related_name='attendances', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
