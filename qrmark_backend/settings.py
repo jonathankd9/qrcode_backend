@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-j%*l#8$om-4#1lpi5b*e_lbcl_0vbzce3j27dw@0z#@q(3pj)o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*','https://qrmark-dashboard.netlify.app/']
 
 
 # Application definition

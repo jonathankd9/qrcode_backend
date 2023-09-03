@@ -2,7 +2,7 @@ from django_cron import CronJobBase, Schedule
 from qrmark_database.models import UniqueCode
 
 class DeleteUniqueCodes(CronJobBase):
-    RUN_EVERY_MINS = 150 # every 2 hours 30 minutes
+    RUN_EVERY_MINS = 1 # every 1 minute
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'qrmark_backend.delete_unique_codes'    # a unique code
