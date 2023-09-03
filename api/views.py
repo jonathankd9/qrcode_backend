@@ -298,6 +298,26 @@ class CRUDCodeAPI(APIView):
         }, status=status.HTTP_201_CREATED)
         # return unique codes
         
+    def delete(self, request, *args, **kwargs):
+        '''Used to delete all unique codes created by user'''
+        lecturer = request.user
+        course_code = request.data.get("course_code")
+        course = Course.objects.filter(lecture=lecturer, code=course_code).first()
+        if course is None:
+            return Response({
+                "message": "Course Not Found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        codes = UniqueCode.objects.filter(course=course)
+        if len(codes) == 0:
+            return Response({
+                "message": "No Codes Found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        else:
+            codes.delete()
+            return Response({
+                "message": "Codes Deleted Successfully",
+            }, status=status.HTTP_200_OK)
+        
 
 class AttendanceAPI(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -375,3 +395,4 @@ class AttendanceAPI(APIView):
             return Response({
                 "message": "Student Not Enrolled in Course"
             }, status=status.HTTP_400_BAD_REQUEST)
+            
